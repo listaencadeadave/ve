@@ -1,0 +1,361 @@
+#include <stdio.h>
+#include <stdlib.h>
+#include<string.h>
+
+typedef struct aluno
+{
+    int codigo;
+    int cpf;
+    char nome[100];
+    struct aluno *prox;
+}aluno;
+
+typedef struct disciplina
+{
+    int codigo;
+    int creditos;
+    char nome[100];
+    char professor[100];
+    struct disciplina *prox;
+}disciplina;
+
+
+//funcao inserir aluno
+aluno* inserir_aluno(aluno* p)
+{
+
+    aluno* alu=(aluno*)malloc(sizeof(aluno));
+    printf("Digite o codigo:\n");
+    scanf("%d",&(*alu).codigo);
+    fflush(stdin);
+    printf("Digite o cpf:\n");
+    scanf("%d",&(*alu).cpf);
+    fflush(stdin);
+    printf("Digite o nome:\n");
+    gets(alu->nome);
+    fflush(stdin);
+    alu->prox=p;
+    return alu;
+}
+
+//funcao inserir disciplina
+disciplina* inserir_disciplina(disciplina* p)
+{
+
+    disciplina* disc=(disciplina*)malloc(sizeof(disciplina));
+    printf("Digite o codigo:\n");
+    scanf("%d",&(*disc).codigo);
+    fflush(stdin);
+    printf("Digite os creditos :\n");
+    scanf("%d",&(*disc).creditos);
+    fflush(stdin);
+    printf("Digite o nome:\n");
+    gets(disc->nome);
+    fflush(stdin);
+    printf("Digite o professor:\n");
+    gets(disc->professor);
+    fflush(stdin);
+    disc->prox=p;
+    return disc;
+}
+
+//funcao consultar por aluno
+void consultar_aluno(aluno* p,disciplina* d,char s[100])
+{
+    int m=0;
+    aluno* alu;
+    disciplina* disc;
+    for(alu=p;alu!=NULL;alu=alu->prox)
+    {
+        if(strcmp(s,alu->nome)==0)
+        {
+            printf("\nO aluno esta cadastrado nas seguintes disciplinas:\n");
+            for(disc=d;disc!=NULL;disc=disc->prox)
+            {
+                printf("%s\n",disc->nome);
+            }
+            m++;
+        }
+    }
+    if(m==0)
+    {
+        printf("O aluno nao esta cadastrado nesse semestre\n");
+    }
+}
+
+//busca por aluno
+aluno* busca_aluno(aluno* p,char s[100])
+{
+    aluno* alu;
+    for(alu=p;alu!=NULL;alu=alu->prox)
+    {
+        if(strcmp(s,alu->nome)==0)
+        {
+           return alu;
+        }
+    }
+    return NULL;
+}
+
+//busca por disciplina
+disciplina* busca_disciplina(disciplina* p,char s[100])
+{
+    disciplina* disc;
+    for(disc=p;disc!=NULL;disc=disc->prox)
+    {
+        if(strcmp(s,disc->nome)==0)
+        {
+           return disc;
+        }
+    }
+    return NULL;
+}
+
+
+
+//funcao consultar por disciplina
+void consultar_disciplina(aluno* p,disciplina* d,char s[100])
+{
+    int m=0;
+    aluno* alu;
+    disciplina* disc;
+    for(disc=d;disc!=NULL;disc=disc->prox)
+    {
+        if(strcmp(s,disc->nome)==0)
+        {
+            printf("\nA disciplina tem os seguintes alunos:\n");
+            for(alu=p;alu!=NULL;alu=alu->prox)
+            {
+                printf("%s\n",alu->nome);
+            }
+            m++;
+        }
+    }
+    if(m==0)
+    {
+        printf("A disciplina nao esta cadastrada nesse semestre\n");
+    }
+}
+
+//funcao remover aluno
+aluno* remover_aluno(aluno* p,char s[100])
+{
+    aluno* ant=NULL;
+    aluno* alu=p;
+    while(alu!=NULL && strcmp(s,alu->nome)!=0)
+    {
+        ant=alu;
+        alu=alu->prox;
+    }
+    if(alu==NULL)
+    {
+        printf("O aluno nao esta cadastrado nesse semestre\n");
+        return p;
+    }
+    if(ant==NULL)
+    {
+        p=alu->prox;
+    }
+    else
+    {
+        ant->prox=alu->prox;
+    }
+    free(alu);
+    return p;
+}
+
+//funcao remover disciplina
+disciplina* remover_disciplina(disciplina* p,char s[100])
+{
+    disciplina* ant=NULL;
+    disciplina* disc=p;
+    while(disc!=NULL && strcmp(s,disc->nome)!=0)
+    {
+        ant=disc;
+        disc=disc->prox;
+    }
+    if(disc==NULL)
+    {
+        printf("A disciplina nao esta cadastrada nesse semestre\n");
+        return p;
+    }
+    if(ant==NULL)
+    {
+        p=disc->prox;
+    }
+    else
+    {
+        ant->prox=disc->prox;
+    }
+    free(disc);
+    return p;
+}
+
+//salvar dados de novos alunos no arquivo
+void salvar_aluno(FILE* file,aluno* p,int n)
+{
+    file=fopen("arquivo.txt","a");
+    fprintf(file,"\nOs seguintes dados foram inseridos na lista de alunos do %d semestre:",n);
+    fprintf(file,"\ncodigo:%d\ncpf:%d\nnome:%s\n",p->codigo,p->cpf,p->nome);
+    fclose(file);
+}
+
+//salvar dados de alunos removidos
+void salvar_aluno_removido(FILE* file,aluno* p,int n)
+{
+    file=fopen("arquivo.txt","a");
+    fprintf(file,"\nOs seguintes dados foram removidos da lista de alunos do %d semestre:",n);
+    fprintf(file,"\ncodigo:%d\ncpf:%d\nnome:%s\n",p->codigo,p->cpf,p->nome);
+    fclose(file);
+}
+
+
+//salvar dados de novas disciplinas no arquivo
+void salvar_disciplina(FILE* file,disciplina* p,int n)
+{
+    file=fopen("arquivo.txt","a");
+    fprintf(file,"\nOs seguintes dados foram inseridos na lista de disciplinas do %d semestre:",n);
+    fprintf(file,"\ncodigo:%d\ncreditos:%d\nnome:%s\nprofessor:%s\n",p->codigo,p->creditos,p->nome,p->professor);
+    fclose(file);
+}
+
+//salvar dados de disciplinas removidas
+void salvar_disciplina_removida(FILE* file,disciplina* p,int n)
+{
+    file=fopen("arquivo.txt","a");
+    fprintf(file,"\nOs seguintes dados foram removidos da lista de disciplinas do %d semestre:",n);
+    fprintf(file,"\ncodigo:%d\ncreditos:%d\nnome:%s\nprofessor\n",p->codigo,p->creditos,p->nome,p->professor);
+    fclose(file);
+}
+
+
+int main()
+{
+    FILE* file;
+    char c,p,s[100];
+    int n;
+    aluno* aluno1=NULL;
+    aluno* y;
+    aluno* aluno2=NULL;
+    disciplina* disciplina1=NULL;
+    disciplina* disciplina2=NULL;
+    disciplina* q;
+
+    while(p!='s')
+    {
+    printf("O que vc deseja fazer:\n(i)inserir\n(r)remover\n(c)consultar\n(s)sair\n");
+    scanf("%c",&p);
+    if(p=='s')
+    {
+        break;
+    }
+    getchar();
+    printf("Como deseja fazer:\n(a)por aluno\n(d)por disciplina\n");
+    scanf("%c",&c);
+    getchar();
+    printf("Digite o periodo de interesse:\n(1)2020.1\n(2)2020.2\n");
+    scanf("%d",&n);
+    fflush(stdin);
+
+    if(p=='i' && c=='a' && n==1)
+    {
+        aluno1=inserir_aluno(aluno1);
+        salvar_aluno(file,aluno1,n);
+    }
+    if(p=='i' && c=='a' && n==2)
+    {
+        aluno2=inserir_aluno(aluno2);
+        salvar_aluno(file,aluno2,n);
+    }
+    if(p=='i' && c=='d' && n==1)
+    {
+        disciplina1=inserir_disciplina(disciplina1);
+        salvar_disciplina(file,disciplina1,n);
+    }
+    if(p=='i' && c=='d' && n==2)
+    {
+        disciplina2=inserir_disciplina(disciplina2);
+        salvar_disciplina(file,disciplina2,n);
+    }
+    if(p=='c' && c=='a' && n==1)
+    {
+        printf("Digite o nome do aluno:\n");
+        gets(s);
+        fflush(stdin);
+        consultar_aluno(aluno1,disciplina1,s);
+    }
+    if(p=='c' && c=='a' && n==2)
+    {
+        printf("Digite o nome do aluno:\n");
+        gets(s);
+        fflush(stdin);
+        consultar_aluno(aluno2,disciplina2,s);
+    }
+    if(p=='c' && c=='d' && n==1)
+    {
+        printf("Digite o nome da disciplina:\n");
+        gets(s);
+        fflush(stdin);
+        consultar_aluno(aluno1,disciplina1,s);
+    }
+     if(p=='c' && c=='d' && n==2)
+    {
+        printf("Digite o nome da disciplina:\n");
+        gets(s);
+        fflush(stdin);
+        consultar_aluno(aluno2,disciplina2,s);
+    }
+    if(p=='r' && c=='a' && n==1)
+    {
+        printf("Digite o nome do aluno a ser removido:\n");
+        gets(s);
+        fflush(stdin);
+        y=busca_aluno(aluno1,s);
+        if(y!=NULL)
+        {
+            salvar_aluno_removido(file,y,n);
+        }
+        aluno1=remover_aluno(aluno1,s);
+    }
+    if(p=='r' && c=='a' && n==2)
+    {
+        printf("Digite o nome do aluno a ser removido:\n");
+        gets(s);
+        fflush(stdin);
+        y=busca_aluno(aluno2,s);
+        if(y!=NULL)
+        {
+            salvar_aluno_removido(file,y,n);
+        }
+        aluno2=remover_aluno(aluno2,s);
+    }
+     if(p=='r' && c=='d' && n==1)
+    {
+        printf("Digite o nome da disciplina a ser removida:\n");
+        gets(s);
+        fflush(stdin);
+        q=busca_disciplina(disciplina1,s);
+        if(q!=NULL)
+        {
+            salvar_disciplina_removida(file,q,n);
+        }
+        disciplina1=remover_disciplina(disciplina1,s);
+    }
+    if(p=='r' && c=='d' && n==2)
+    {
+        printf("Digite o nome da disciplina a ser removida:\n");
+        gets(s);
+        fflush(stdin);
+        q=busca_disciplina(disciplina2,s);
+        if(q!=NULL)
+        {
+            salvar_disciplina_removida(file,q,n);
+        }
+        disciplina2=remover_disciplina(disciplina2,s);
+    }
+    printf("\n");
+
+    }
+
+}
+
